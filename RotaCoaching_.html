@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Execução Comercial — MAR Foods</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0d0f14; --surface: #161a22; --surface2: #1e2430; --border: #2a3040;
+  --accent: #00e5a0; --accent2: #0088ff; --danger: #ff4d6d; --warn: #ffc24a;
+  --text: #e8edf5; --muted: #7a8599; --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--accent); padding: 16px 24px 16px 0; border-right: 1px solid var(--border); margin-right: 8px; }
+.nav-tabs { display: flex; }
+.nav-tab { padding: 18px 20px; cursor: pointer; color: var(--muted); font-size: 0.875rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.page { display: none; padding: 32px 24px; max-width: 1200px; margin: 0 auto; }
+.page.active { display: block; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+.section-title span { color: var(--accent); }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+.card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+
+.form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select, .field textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; transition: border-color 0.2s; outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field textarea { resize: vertical; min-height: 80px; }
+.field select option { background: var(--surface2); }
+
+.pdv-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.pdv-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; position: relative; }
+.pdv-btn:hover { border-color: var(--accent); color: var(--text); }
+.pdv-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+.pdv-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: absolute; top: -3px; right: -3px; display: none; border: 2px solid var(--bg); }
+.pdv-btn.saved .dot { display: block; }
+
+.checklist-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.checklist-item:last-child { border-bottom: none; }
+.step-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--accent); white-space: nowrap; flex-shrink: 0; }
+.checklist-content { flex: 1; }
+.checklist-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+.checklist-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+.toggle-row { display: flex; gap: 8px; flex-shrink: 0; }
+.toggle-btn { padding: 6px 13px; border-radius: 7px; border: 1px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--muted); }
+.toggle-btn.sim.selected { background: var(--accent); border-color: var(--accent); color: #000; }
+.toggle-btn.executou { border-color: var(--accent); color: var(--accent); }
+.toggle-btn.executou.selected { background: var(--accent); border-color: var(--accent); color: #000; font-weight:700; }
+.toggle-btn.parcial { border-color: var(--warn); color: var(--warn); }
+.toggle-btn.parcial.selected { background: var(--warn); border-color: var(--warn); color: #000; font-weight:700; }
+.toggle-btn.naoexec { border-color: var(--danger); color: var(--danger); }
+.toggle-btn.naoexec.selected { background: var(--danger); border-color: var(--danger); color: #fff; font-weight:700; }
+.toggle-btn.nao.selected { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+.mix-section { background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 16px; }
+.mix-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.mix-items { display: flex; gap: 12px; flex-wrap: wrap; }
+.mix-check { display: flex; align-items: center; gap: 5px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; transition: border-color 0.15s; }
+.mix-check:hover { border-color: var(--accent); }
+.mix-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+.mix-check span { font-size: 0.8rem; }
+
+.bottom-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding: 18px 0 4px; border-top: 2px solid var(--border); margin-top: 18px; }
+.bfield-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+
+.resultado-auto { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.metric-auto { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+.metric-auto .ml { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; }
+.metric-auto .mv { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+
+.btn { padding: 11px 22px; border-radius: 9px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; transition: all 0.2s; }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-save-pdv { background: var(--accent2); color: #fff; width: 100%; margin-top: 18px; padding: 13px; font-size: 0.95rem; border-radius: 9px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; transition: filter 0.2s; }
+.btn-save-pdv:hover { filter: brightness(1.15); }
+
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; }
+.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--c, var(--accent)); }
+.metric-card .m-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+.metric-card .m-val { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--c, var(--accent)); line-height: 1; }
+.metric-card .m-sub { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+thead th { text-align: left; padding: 10px 12px; color: var(--muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 11px 12px; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-green { background: rgba(0,229,160,.12); color: var(--accent); }
+.badge-red { background: rgba(255,77,109,.12); color: var(--danger); }
+.badge-warn { background: rgba(255,194,74,.12); color: var(--warn); }
+.prog-bar-wrap { background: var(--surface2); border-radius: 4px; height: 6px; margin-top: 6px; }
+.prog-bar { height: 6px; border-radius: 4px; transition: width .5s; }
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 22px; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; z-index: 999; transform: translateY(80px); opacity: 0; transition: all .3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.filter-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
+.filter-row .field { min-width: 160px; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: .9rem; }
+
+@media(max-width:768px){
+  /* NAV — ícones em baixo tipo app */
+  nav { flex-direction: column; padding: 0; position: fixed; bottom: 0; top: auto; left: 0; right: 0; border-top: 1px solid var(--border); border-bottom: none; z-index: 200; }
+  .nav-logo { display: none; }
+  .nav-tabs { width: 100%; display: flex; justify-content: space-around; }
+  .nav-tab { flex: 1; padding: 10px 4px 8px; font-size: 0.65rem; text-align: center; border-bottom: none; border-top: 3px solid transparent; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .nav-tab.active { border-top-color: var(--accent); border-bottom: none; }
+  /* Page padding: account for fixed bottom nav */
+  .page { padding: 16px 14px 80px; }
+  .section-title { font-size: 1.15rem; margin-bottom: 16px; }
+  .card { padding: 16px 14px; margin-bottom: 14px; }
+
+  /* GRIDS */
+  .metrics-grid,.resultado-auto { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row.cols-2,.form-row.cols-3,.form-row.cols-4 { grid-template-columns: 1fr; gap: 12px; }
+  .bottom-fields { grid-template-columns: 1fr; gap: 14px; }
+
+  /* PDV NAV scroll horizontal */
+  .pdv-nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .pdv-nav::-webkit-scrollbar { display: none; }
+  .pdv-btn { flex-shrink: 0; padding: 9px 14px; font-size: 0.8rem; }
+
+  /* Checklist — stack em mobile */
+  .checklist-item { flex-wrap: wrap; gap: 10px; padding: 12px 0; }
+  .checklist-content { flex: 1 1 100%; order: 2; }
+  .step-badge { order: 1; }
+  .toggle-row { order: 3; width: 100%; justify-content: flex-end; }
+  .toggle-btn { flex: 1; text-align: center; padding: 10px 8px; font-size: 0.9rem; }
+
+  /* Mix checkboxes */
+  .mix-items { gap: 8px; }
+  .mix-check { padding: 8px 10px; font-size: 0.85rem; }
+
+  /* Botões de ação */
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; text-align: center; padding: 14px; font-size: 1rem; }
+  .btn-save-pdv { padding: 15px; font-size: 1rem; margin-top: 20px; }
+
+  /* Dashboard charts side-by-side → stack */
+  #page-dashboard > div[style*="grid-template-columns:1fr 1fr"] { display: flex !important; flex-direction: column !important; gap: 14px !important; }
+  .metric-card .m-val { font-size: 1.6rem; }
+
+  /* Histórico tabela scroll */
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+
+  /* Filter row */
+  .filter-row { flex-direction: column; }
+  .filter-row .field { min-width: unset; width: 100%; }
+  .filter-row .btn { width: 100%; }
+
+  /* Toast */
+  .toast { left: 16px; right: 16px; bottom: 80px; text-align: center; }
+
+  /* Inputs maiores para touch */
+  .field input, .field select, .field textarea { padding: 13px 14px; font-size: 1rem; }
+
+  /* Bottom fields toggle */
+  .bfield-label { font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TELA DE LOGIN ===== -->
+<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--accent)">⬡ MAR FOODS</div>
+  <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text)">Execução Comercial</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px">
+    <div class="field">
+      <label>Supervisor</label>
+      <select id="login-usuario" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="••••••••"
+        style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;letter-spacing:.15em"
+        onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <div id="login-erro" style="color:var(--danger);font-size:.85rem;text-align:center;display:none">❌ Usuário ou senha incorretos</div>
+    <button onclick="fazerLogin()" style="background:var(--accent);color:#000;border:none;border-radius:10px;padding:14px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-top:4px">Entrar</button>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo">⬡ MAR FOODS</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('form',this)"><span style="font-size:1.2rem">📋</span><span>Formulário</span></div>
+    <div class="nav-tab" onclick="showPage('dashboard',this)"><span style="font-size:1.2rem">📊</span><span>Dashboard</span></div>
+    <div class="nav-tab" onclick="showPage('ranking',this)"><span style="font-size:1.2rem">🏆</span><span>Ranking</span></div>
+    <div class="nav-tab" onclick="showPage('historico',this)"><span style="font-size:1.2rem">🗂️</span><span>Histórico</span></div>
+    <div class="nav-tab" onclick="showPage('cadastros',this)"><span style="font-size:1.2rem">📋</span><span>Cadastros</span></div>
+    <div class="nav-tab" onclick="showPage('config',this)"><span style="font-size:1.2rem">⚙️</span><span>Config.</span></div>
+  </div>
+</nav>
+
+<!-- ===== FORMULÁRIO ===== -->
+<div id="page-form" class="page active">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div class="section-title" style="margin-bottom:0">Execução Comercial — <span>MAR Foods</span></div>
+    <button onclick="abrirCadVendedores()" style="background:var(--surface2);border:1px solid var(--accent);color:var(--accent);border-radius:9px;padding:10px 18px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem">👤 Cadastro de Vendedores</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Identificação</div>
+    <div class="form-row cols-4">
+      <div class="field"><label>Supervisor</label><select id="f-supervisor"><option value="">Selecione...</option></select></div>
+      <div class="field"><label>RCA / Vendedor</label><select id="f-vendedor"><option value="">Selecione o vendedor...</option></select></div>
+      <div class="field"><label>Rota</label><input type="text" id="f-rota" placeholder="Ex: Rota 01 / Centro"></div>
+      <div class="field"><label>Data</label><input type="date" id="f-data"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pontos de Venda (PDVs)</div>
+    <div class="pdv-nav" id="pdv-nav"></div>
+    <div id="pdv-content"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Resultado da Rota <span style="font-size:.75rem;color:var(--accent);font-weight:400;text-transform:none;letter-spacing:0">— automático, baseado nos PDVs salvos</span></div>
+    <div class="resultado-auto">
+      <div class="metric-auto"><div class="ml">PDVs Visitados</div><div class="mv" id="auto-visit">0</div></div>
+      <div class="metric-auto"><div class="ml">PDVs Positivados</div><div class="mv" id="auto-pos">0</div></div>
+      <div class="metric-auto"><div class="ml">Cadastros</div><div class="mv" id="auto-cad">0</div></div>
+      <div class="metric-auto"><div class="ml">Total Vendas R$</div><div class="mv" id="auto-vlr">R$0</div></div>
+    </div>
+    <div class="field"><label>Observações da Rota</label><textarea id="r-obs" placeholder="Anotações gerais sobre a rota do dia..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Feedback do Supervisor</div>
+    <div class="form-row cols-2">
+      <div class="field"><label>✅ Pontos Positivos</label><textarea id="f-positivos" placeholder="O que foi bem feito..."></textarea></div>
+      <div class="field"><label>📈 Pontos a Desenvolver</label><textarea id="f-desenvolver" placeholder="O que pode melhorar..."></textarea></div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-secondary" onclick="limparFormulario()">Limpar</button>
+    <button class="btn btn-primary" onclick="salvarFormulario()">💾 Salvar Formulário Completo</button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="page-dashboard" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div class="section-title" style="margin-bottom:0">Dashboard de <span>Métricas</span></div>
+    <button onclick="atualizarDoSheets()" id="btn-refresh" style="background:var(--accent);color:#000;border:none;border-radius:9px;padding:10px 20px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem">🔄 Atualizar Planilha</button>
+  </div>
+  <div class="filter-row">
+    <div class="field"><label>Supervisor</label><select id="dash-supervisor" onchange="renderDashboard()"><option value="">Todos</option></select></div>
+    <div class="field"><label>Vendedor</label><select id="dash-vendedor" onchange="renderDashboard()"><option value="">Todos</option></select></div>
+    <div class="field"><label>Mês</label>
+      <select id="dash-mes" onchange="renderDashboard()">
+        <option value="">Todos os meses</option>
+        <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+        <option value="03">Março</option><option value="04">Abril</option>
+        <option value="05">Maio</option><option value="06">Junho</option>
+        <option value="07">Julho</option><option value="08">Agosto</option>
+        <option value="09">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+    </div>
+    <div class="field"><label>Data Específica</label><input type="date" id="dash-data" onchange="renderDashboard()"></div>
+    <div class="field"><label>Período</label>
+      <select id="dash-periodo" onchange="renderDashboard()">
+        <option value="7">Últimos 7 dias</option>
+        <option value="0" selected>Todos</option>
+        <option value="90">Últimos 90 dias</option>
+        <option value="0">Todos</option>
+      </select>
+    </div>
+  </div>
+  <div class="metrics-grid" id="dash-metrics"></div>
+  <div class="card"><div class="card-title">9 Passos — Taxa de Adesão</div><div id="dash-passos"></div></div>
+  <div class="card"><div class="card-title">Mix Obrigatório por Ramo</div><div id="dash-mix"></div></div>
+  <div class="card"><div class="card-title">Visitas por Ramo</div><canvas id="chart-ramo" height="80"></canvas></div>
+  <div class="card"><div class="card-title">Rotas Realizadas por Supervisor</div><canvas id="chart-rotas" height="80"></canvas></div>
+  <div class="card"><div class="card-title">Taxa de Conversão por Supervisor (%)</div><canvas id="chart-conv" height="90"></canvas></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card"><div class="card-title">PDVs Visitados por Supervisor</div><canvas id="chart-visit" height="120"></canvas></div>
+    <div class="card"><div class="card-title">PDVs Positivados por Supervisor</div><canvas id="chart-posit" height="120"></canvas></div>
+  </div>
+  <div class="card"><div class="card-title">Visitas por Dia</div><canvas id="chart-dias" height="80"></canvas></div>
+</div>
+
+
+<!-- ===== MODAL CADASTRO VENDEDORES ===== -->
+<div id="vend-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">👤 Meus Vendedores</div>
+      <button onclick="fecharCadVendedores()" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:.85rem">✕ Fechar</button>
+    </div>
+    <div id="vend-modal-sup" style="font-size:.85rem;color:var(--accent);font-weight:700;margin-bottom:16px"></div>
+    <div id="vend-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="vend-new-input" placeholder="Nome do vendedor" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none" onkeydown="if(event.key==='Enter')addVendedor()">
+      <button onclick="addVendedor()" class="btn btn-primary">+ Adicionar</button>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+      <button onclick="salvarVendedoresNuvem()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem">☁️ Salvar na Nuvem</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DRILL-DOWN OVERLAY ===== -->
+<div id="drilldown-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto;padding:24px">
+  <div style="max-width:900px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+      <button onclick="fecharDrilldown()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 18px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem">← Voltar</button>
+      <div id="drilldown-title" style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700"></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead id="drilldown-thead"></thead>
+          <tbody id="drilldown-tbody"></tbody>
+        </table>
+      </div>
+      <div id="drilldown-empty" style="display:none;text-align:center;padding:40px;color:var(--muted)">Nenhum dado encontrado</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RANKING ===== -->
+<div id="page-ranking" class="page">
+  <div class="section-title">🏆 <span>Ranking</span></div>
+  <div class="filter-row">
+    <div class="field"><label>Supervisor</label><select id="rank-supervisor" onchange="renderRanking()"><option value="">Todos</option></select></div>
+    <div class="field"><label>Vendedor</label><select id="rank-vendedor" onchange="renderRanking()"><option value="">Todos</option></select></div>
+    <div class="field"><label>Mês</label>
+      <select id="rank-mes" onchange="renderRanking()">
+        <option value="">Todos os meses</option>
+        <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+        <option value="03">Março</option><option value="04">Abril</option>
+        <option value="05">Maio</option><option value="06">Junho</option>
+        <option value="07">Julho</option><option value="08">Agosto</option>
+        <option value="09">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+    </div>
+    <div class="field"><label>Data Específica</label><input type="date" id="rank-data" onchange="renderRanking()"></div>
+    <div class="field"><label>Período</label>
+      <select id="rank-periodo" onchange="renderRanking()">
+        <option value="7">Últimos 7 dias</option>
+        <option value="0" selected>Todos</option>
+        <option value="90">Últimos 90 dias</option>
+        <option value="0">Todos</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px" id="ranking-grids">
+    <div class="card">
+      <div class="card-title">🥇 Por Supervisor</div>
+      <div id="rank-supervisor-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥇 Por Vendedor</div>
+      <div id="rank-vendedor-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HISTÓRICO ===== -->
+<div id="page-historico" class="page">
+  <div class="section-title">Histórico de <span>Formulários</span></div>
+  <div class="filter-row">
+    <div class="field"><label>Buscar</label><input type="text" id="hist-search" placeholder="Vendedor / Supervisor..." oninput="renderHistorico()"></div>
+    <div class="field"><label>Data</label><input type="date" id="hist-data" onchange="renderHistorico()"></div>
+    <button class="btn btn-secondary" style="margin-top:auto" onclick="exportarCSV()">⬇ Exportar CSV</button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>Rota</th><th>Visit.</th><th>Positiv.</th><th>%Pos</th><th>Venda R$</th><th>Cadastros</th><th>Passos</th><th>Ações</th></tr></thead>
+        <tbody id="hist-tbody"></tbody>
+      </table>
+    </div>
+    <div id="hist-empty" class="empty-state" style="display:none">📭 Nenhum formulário encontrado</div>
+  </div>
+</div>
+
+<!-- ===== CONFIGURAÇÕES ===== -->
+<div id="page-cadastros" class="page">
+  <!-- TELA DE SENHA CADASTROS -->
+  <div id="cad-lock" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px">
+    <div style="font-size:3rem">🔒</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700">Área Restrita — Cadastros</div>
+    <p style="color:var(--muted);font-size:.9rem">Digite a senha para acessar</p>
+    <div style="display:flex;gap:10px;width:100%;max-width:320px">
+      <input type="password" id="cad-senha" placeholder="Senha..." maxlength="30"
+        style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;text-align:center;letter-spacing:.2em"
+        onkeydown="if(event.key==='Enter')verificarSenhaCad()">
+      <button class="btn btn-primary" onclick="verificarSenhaCad()">Entrar</button>
+    </div>
+    <div id="cad-erro" style="color:var(--danger);font-size:.85rem;display:none">❌ Senha incorreta</div>
+  </div>
+  <!-- CONTEÚDO CADASTROS -->
+  <div id="cad-content" style="display:none">
+    <div class="section-title">📋 <span>Cadastros</span>
+      <button onclick="bloquearCad()" style="float:right;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif">🔒 Bloquear</button>
+    </div>
+    <div class="card">
+      <div class="card-title">👤 Supervisores Ativos</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Gerencie a lista de supervisores que aparece no formulário.</p>
+      <div id="sup-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="text" id="sup-new-input" placeholder="Nome do novo supervisor" style="flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none" onkeydown="if(event.key==='Enter')addSupervisor()">
+        <input type="password" id="sup-new-senha" placeholder="Senha do supervisor" style="flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none">
+        <button class="btn btn-primary" onclick="addSupervisor()">+ Adicionar</button>
+      </div>
+      <div style="margin-top:14px;text-align:right">
+        <button onclick="syncSupsToSheets(ok=>showToast(ok?'☁️ Supervisores salvos na nuvem!':'⚠️ Erro ao salvar','ok?'var(--accent)':\'var(--danger)\''))" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem">☁️ Salvar Supervisores na Nuvem</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏪 Ramos de Atividade</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Gerencie os ramos que aparecem no formulário. <strong style="color:var(--warn)">Atenção:</strong> ao remover um ramo, o Mix correspondente também é removido.</p>
+      <div id="ramo-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="text" id="ramo-new-name" placeholder="Nome do ramo (ex: PADARIA)" style="flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none">
+        <input type="text" id="ramo-new-items" placeholder="Itens do mix separados por vírgula (ex: Pão,Bolo,Café)" style="flex:2;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none">
+        <button class="btn btn-primary" onclick="addRamo()">+ Adicionar Ramo</button>
+      </div>
+      <div style="margin-top:14px;text-align:right">
+        <button onclick="syncRamosToSheets(ok=>showToast(ok?'☁️ Ramos salvos na nuvem!':'⚠️ Erro ao salvar'))" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem">☁️ Salvar Ramos na Nuvem</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-config" class="page">
+
+  <!-- TELA DE SENHA -->
+  <div id="config-lock" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px">
+    <div style="font-size:3rem">🔒</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700">Área Restrita</div>
+    <p style="color:var(--muted);font-size:.9rem">Digite a senha para acessar as configurações</p>
+    <div style="display:flex;gap:10px;width:100%;max-width:320px">
+      <input type="password" id="config-senha" placeholder="Senha..." maxlength="20"
+        style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;text-align:center;letter-spacing:.2em"
+        onkeydown="if(event.key==='Enter')verificarSenha()">
+      <button class="btn btn-primary" onclick="verificarSenha()">Entrar</button>
+    </div>
+    <div id="senha-erro" style="color:var(--danger);font-size:.85rem;display:none">❌ Senha incorreta</div>
+  </div>
+
+  <!-- CONTEÚDO DAS CONFIGURAÇÕES (oculto até senha correta) -->
+  <div id="config-content" style="display:none">
+    <div class="section-title">⚙️ <span>Configurações</span>
+      <button onclick="bloquearConfig()" style="float:right;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif">🔒 Bloquear</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔗 Integração Google Sheets</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Cole aqui a URL do seu Google Apps Script Web App.</p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;font-size:.83rem;line-height:1.8;color:var(--text)">
+        <strong style="color:var(--accent)">Passo a passo:</strong><br>
+        1. Abra <a href="https://script.google.com" target="_blank" style="color:var(--accent2)">script.google.com</a> → clique em <strong>Novo Projeto</strong><br>
+        2. Apague o código existente e cole o código do arquivo <strong>apps_script.js</strong> fornecido<br>
+        3. Clique em <strong>Implantar → Nova implantação</strong><br>
+        4. Tipo: <strong>App da Web</strong> | Executar como: <strong>Eu</strong> | Acesso: <strong>Qualquer pessoa</strong><br>
+        5. Clique em <strong>Implantar</strong>, copie a URL gerada e cole abaixo
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div class="field" style="flex:1">
+          <label>URL do Apps Script Web App</label>
+          <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/...">
+        </div>
+        <button class="btn btn-primary" onclick="saveSheetsUrl()">Salvar URL</button>
+        <button class="btn btn-secondary" onclick="testSheetsUrl()">Testar</button>
+      </div>
+      <div id="sheets-status" style="margin-top:10px;font-size:.82rem"></div>
+    </div>
+
+
+    <div class="card" style="border-color:rgba(255,77,109,.4)">
+      <div class="card-title" style="color:var(--danger)">🗑️ Zerar Dados de Teste</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Remove <strong>todos os registros locais</strong> do app neste dispositivo. Use antes de iniciar o uso real na segunda-feira. <strong style="color:var(--danger)">Esta ação não pode ser desfeita.</strong></p>
+      <div style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.3);border-radius:10px;padding:14px;margin-bottom:16px;font-size:.83rem;color:var(--text)">
+        ⚠️ <strong>Atenção:</strong> Isso apaga apenas os dados locais deste navegador/dispositivo.<br>
+        Para zerar a planilha Google Sheets, acesse-a diretamente e exclua as linhas manualmente (mantenha a linha 1 do cabeçalho).
+      </div>
+      <button class="btn btn-danger" style="width:100%;padding:14px;font-size:1rem" onclick="zerarDadosTeste()">🗑️ Zerar Todos os Dados de Teste</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PASSOS = [
+  {id:'p1',lbl:'Passo 1',title:'Rota de Visitação',desc:'Planejar rota de visita ao mercado',peso:10},
+  {id:'p2',lbl:'Passo 2',title:'Entender suas Metas',desc:'Atualização resultados acumulados e definição meta dia',peso:10},
+  {id:'p3',lbl:'Passo 3',title:'Definir Objetivo da Visita',desc:'Ter claro o objetivo antes de entrar no PDV (positivação, mix, ticket médio)',peso:10},
+  {id:'p4',lbl:'Passo 4',title:'Levantar Informações do Cliente',desc:'Análise Batalha Naval, quais itens serão trabalhados na proposta',peso:15},
+  {id:'p5',lbl:'Passo 5',title:'Preparar Argumentação de Vendas',desc:'Estudar ações do dia e como o cliente será abordado',peso:5},
+  {id:'p6',lbl:'Passo 6',title:'Ser e Parecer Conhecido',desc:'Ser cordial, apresentar Catálogo de Vendas, zelar pelo relacionamento',peso:5},
+  {id:'p7',lbl:'Passo 7',title:'Identificar Necessidade do Cliente',desc:'Fazer perguntas direcionadas para identificar necessidade de compra',peso:15},
+  {id:'p8',lbl:'Passo 8',title:'Realizar Proposta de Vendas',desc:'Propor vendas considerando giro e adesão ao mix obrigatório',peso:20},
+  {id:'p9',lbl:'Passo 9',title:'Fazer Fechamento da Venda',desc:'Confirmar itens, valor, prazo, condição de pagamento, agradecer',peso:10},
+];
+
+const DEFAULT_MIX = {
+  VAREJO:      {label:'Mix Varejo',      items:[{k:'F',v:'Frutas Congeladas'},{k:'V',v:'Vegetais'},{k:'B',v:'Bebidas'},{k:'L',v:'Laticínios'},{k:'E',v:'Embutidos'}]},
+  ACAITERIA:   {label:'Mix Açaiteria',   items:[{k:'A5',v:'Açaí cx 5kg'},{k:'A10',v:'Açaí cx 10kg'},{k:'LP',v:'Leite em Pó'},{k:'C',v:'Cremes'},{k:'P',v:'Paçoca'}]},
+  RESTAURANTE: {label:'Mix Restaurante', items:[{k:'B',v:'Bovino'},{k:'F',v:'Frango'},{k:'V',v:'Vegetais'},{k:'E',v:'Embutidos'},{k:'L',v:'Laticínios'}]},
+  LANCHERIA:   {label:'Mix Lancheria',   items:[{k:'B',v:'Bovino'},{k:'F',v:'Frango'},{k:'V',v:'Vegetais'},{k:'E',v:'Embutidos'},{k:'L',v:'Laticínios'}]},
+  PIZZARIA:    {label:'Mix Pizzaria',    items:[{k:'B',v:'Bovino'},{k:'F',v:'Frango'},{k:'V',v:'Vegetais'},{k:'E',v:'Embutidos'},{k:'L',v:'Laticínios'}]},
+};
+function getMIX() {
+  const saved = localStorage.getItem('coaching_mix');
+  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_MIX));
+}
+function saveMIX(m) { localStorage.setItem('coaching_mix', JSON.stringify(m)); }
+let MIX = getMIX();
+
+const N_INICIAL = 8;
+let cur = 0, pdvs = [];
+
+const getDB = () => JSON.parse(localStorage.getItem('coaching_db')||'[]');
+const saveDB = db => localStorage.setItem('coaching_db', JSON.stringify(db));
+
+function newPdv() { return {clienteId:'',nomeCliente:'',ramo:'',passos:{},mix:[],positivou:null,cadastrou:null,vlr:'',saved:false}; }
+function initPdvs() { pdvs = Array.from({length:N_INICIAL}, newPdv); }
+
+function adicionarPdv() {
+  readDOM(cur);
+  pdvs.push(newPdv());
+  renderNav();
+  switchTo(pdvs.length - 1);
+  showToast(`✅ PDV ${pdvs.length} adicionado!`);
+}
+
+function init() {
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  initPdvs(); renderNav(); renderPdv(0);
+  renderSupSelector();
+  initLogin();
+  // Carrega supervisores e vendedores do Sheets (fonte central)
+  syncAllFromSheets(() => {
+    renderSupSelector();
+    initLogin();
+    renderVendedorSelect();
+  });
+}
+
+// ---- NAV ----
+function renderNav() {
+  document.getElementById('pdv-nav').innerHTML = pdvs.map((d,i)=>`
+    <div class="pdv-btn ${i===cur?'active':''} ${d.saved?'saved':''}" onclick="switchTo(${i})">
+      PDV ${i+1}${d.nomeCliente?' — '+d.nomeCliente.slice(0,10):''}
+      <span class="dot"></span>
+    </div>`).join('') +
+    `<div class="pdv-btn" onclick="adicionarPdv()" title="Adicionar novo PDV" style="border-color:var(--accent);color:var(--accent);font-size:1.1rem;font-weight:800;padding:8px 14px;min-width:38px;text-align:center">+</div>`;
+}
+
+// ---- SWITCH ----
+function switchTo(idx) { readDOM(cur); cur=idx; renderNav(); renderPdv(idx); }
+
+// ---- READ DOM → pdvs[idx] ----
+function readDOM(idx) {
+  const d = pdvs[idx];
+  const g = id => document.getElementById(id);
+  if(g(`ci-${idx}`)) d.clienteId = g(`ci-${idx}`).value;
+  if(g(`cn-${idx}`)) d.nomeCliente = g(`cn-${idx}`).value;
+  if(g(`ramo-${idx}`)) d.ramo = g(`ramo-${idx}`).value;
+  if(g(`vlr-${idx}`)) d.vlr = g(`vlr-${idx}`).value;
+  PASSOS.forEach(p => {
+    const v = document.querySelector(`input[name="pp-${idx}-${p.id}"]:checked`)?.value;
+    if(v!==undefined) d.passos[p.id]=v;
+  });
+  if(d.ramo && MIX[d.ramo])
+    d.mix = MIX[d.ramo].items.filter(it=>g(`mx-${idx}-${it.k}`)?.checked).map(it=>it.k);
+  const pos = document.querySelector(`input[name="pos-${idx}"]:checked`)?.value;
+  if(pos!==undefined) d.positivou=pos;
+  const cad = document.querySelector(`input[name="cad-${idx}"]:checked`)?.value;
+  if(cad!==undefined) d.cadastrou=cad;
+}
+
+// ---- RENDER PDV ----
+function renderPdv(idx) {
+  const d = pdvs[idx];
+  const savedBanner = d.saved
+    ? `<div style="background:rgba(0,229,160,.1);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.85rem;color:var(--accent);font-weight:600">✅ PDV salvo — pode editar e salvar novamente</div>`
+    : '';
+
+  const ramoOpts = Object.keys(MIX).map(k=>`<option value="${k}" ${d.ramo===k?'selected':''}>${k.charAt(0)+k.slice(1).toLowerCase().replace('acaiteria','çaiteria')}</option>`).join('');
+
+  const passosHtml = PASSOS.map(p=>`
+    <div class="checklist-item">
+      <div class="step-badge">${p.lbl}</div>
+      <div class="checklist-content">
+        <div class="checklist-title">${p.title}</div>
+        <div class="checklist-desc">${p.desc}</div>
+      </div>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn executou ${d.passos[p.id]==='E'?'selected':''}" onclick="setP(${idx},'${p.id}','E',this)">✓ Executou</button>
+        <button type="button" class="toggle-btn parcial ${d.passos[p.id]==='P'?'selected':''}" onclick="setP(${idx},'${p.id}','P',this)">~ Parcial</button>
+        <button type="button" class="toggle-btn naoexec ${d.passos[p.id]==='N'?'selected':''}" onclick="setP(${idx},'${p.id}','N',this)">✗ Não Executou</button>
+      </div>
+    </div>`).join('');
+
+  let mixHtml = '';
+  if(d.ramo && MIX[d.ramo]) {
+    const m = MIX[d.ramo];
+    mixHtml = `<div class="mix-section">
+      <div class="mix-section-title">✔ ${m.label} — marque os itens trabalhados</div>
+      <div class="mix-items">${m.items.map(it=>`
+        <label class="mix-check">
+          <input type="checkbox" id="mx-${idx}-${it.k}" ${(d.mix||[]).includes(it.k)?'checked':''}>
+          <span><strong>${it.k}</strong> — ${it.v}</span>
+        </label>`).join('')}
+      </div></div>`;
+  } else {
+    mixHtml = `<div style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:8px;color:var(--muted);font-size:.85rem">⬆ Selecione o <strong>Ramo</strong> acima para ver o Mix Obrigatório correspondente.</div>`;
+  }
+
+  document.getElementById('pdv-content').innerHTML = `
+    ${savedBanner}
+    <div class="form-row cols-3">
+      <div class="field"><label>ID Cliente (número)</label><input type="number" id="ci-${idx}" value="${d.clienteId}" placeholder="Ex: 10045"></div>
+      <div class="field"><label>Nome do Cliente</label><input type="text" id="cn-${idx}" value="${d.nomeCliente}" placeholder="Nome do estabelecimento"></div>
+      <div class="field"><label>Ramo</label>
+        <select id="ramo-${idx}" onchange="onRamo(${idx})">
+          <option value="">Selecione o ramo...</option>${ramoOpts}
+        </select>
+      </div>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">9 Passos do Vendedor</div>
+    ${passosHtml}
+    ${mixHtml}
+    <div class="bottom-fields">
+      <div>
+        <div class="bfield-label">🎯 Positivou?</div>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn sim ${d.positivou==='S'?'selected':''}" onclick="setBot(${idx},'pos','S',this)">✓ Sim</button>
+          <button type="button" class="toggle-btn nao ${d.positivou==='N'?'selected':''}" onclick="setBot(${idx},'pos','N',this)">✗ Não</button>
+        </div>
+      </div>
+      <div>
+        <div class="bfield-label">🆕 Cadastrou?</div>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn sim ${d.cadastrou==='S'?'selected':''}" onclick="setBot(${idx},'cad','S',this)">✓ Sim</button>
+          <button type="button" class="toggle-btn nao ${d.cadastrou==='N'?'selected':''}" onclick="setBot(${idx},'cad','N',this)">✗ Não</button>
+        </div>
+      </div>
+      <div>
+        <div class="bfield-label">💰 Vlr. Vendido R$</div>
+        <input type="number" id="vlr-${idx}" value="${d.vlr}" placeholder="0,00" min="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-size:.9rem;outline:none;width:100%;transition:border-color .2s"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+    </div>
+    <button class="btn-save-pdv" onclick="savePdv(${idx})">💾 Salvar PDV ${idx+1}</button>
+  `;
+}
+
+function onRamo(idx) { readDOM(idx); pdvs[idx].mix=[]; renderPdv(idx); }
+function setP(idx,pid,val,btn) { pdvs[idx].passos[pid]=val; btn.parentElement.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); }
+function setBot(idx,f,val,btn) { if(f==='pos') pdvs[idx].positivou=val; else pdvs[idx].cadastrou=val; btn.parentElement.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); }
+
+// ---- VALIDA IDENTIFICAÇÃO ----
+function validarIdentificacao() {
+  const sup  = document.getElementById('f-supervisor').value.trim();
+  const vend = document.getElementById('f-vendedor').value.trim();
+  const rota = document.getElementById('f-rota').value.trim();
+  const data = document.getElementById('f-data').value;
+  if(!sup || !vend || !rota || !data) {
+    let msg = '⚠️ Preencha os campos de IDENTIFICAÇÃO antes de continuar:\n\n';
+    if(!sup)  msg += '• Supervisor\n';
+    if(!vend) msg += '• RCA / Vendedor\n';
+    if(!rota) msg += '• Rota\n';
+    if(!data) msg += '• Data\n';
+    alert(msg);
+    return false;
+  }
+  return true;
+}
+
+function savePdv(idx) {
+  if(!validarIdentificacao()) return;
+  readDOM(idx);
+  const d = pdvs[idx];
+
+  // Validações obrigatórias: Nome do Cliente e Ramo
+  if(!d.nomeCliente.trim()) { showToast(`⚠️ PDV ${idx+1}: Nome do Cliente é obrigatório!`,'#ffc24a'); return; }
+  if(!d.ramo) { showToast(`⚠️ PDV ${idx+1}: Ramo é obrigatório!`,'#ffc24a'); return; }
+
+  // Aviso (não obrigatório) se ID Cliente não preenchido
+  if(!d.clienteId) {
+    if(!confirm(`⚠️ PDV ${idx+1}: Código ID não está preenchido.\nConfirma salvar mesmo assim?\n(OK = confirmar | Cancelar = voltar e preencher)`)) return;
+  }
+
+  pdvs[idx].saved=true;
+  renderNav();
+  updateAuto();
+  showToast(`✅ PDV ${idx+1} salvo!`);
+}
+
+function updateAuto() {
+  const sv = pdvs.filter(d=>d.saved);
+  document.getElementById('auto-visit').textContent = sv.length;
+  document.getElementById('auto-pos').textContent = sv.filter(d=>d.positivou==='S').length;
+  document.getElementById('auto-cad').textContent = sv.filter(d=>d.cadastrou==='S').length;
+  document.getElementById('auto-vlr').textContent = 'R$'+sv.reduce((s,d)=>s+(+d.vlr||0),0).toLocaleString('pt-BR');
+}
+
+// ---- CONFIG GOOGLE SHEETS ----
+const SHEETS_URL = localStorage.getItem('coaching_sheets_url') || 'https://script.google.com/macros/s/AKfycbwYkRlbqqIO3npwJsBm9zap0Pg7V3_YjOpj4ki-aIoDB0JP8msirker9AOBi6zamhsR/exec';
+
+// ---- SALVAR FORMULÁRIO ----
+async function salvarFormulario() {
+  if(!validarIdentificacao()) return;
+  readDOM(cur);
+  const sup  = document.getElementById('f-supervisor').value.trim();
+  const vend = document.getElementById('f-vendedor').value.trim();
+  const rota = document.getElementById('f-rota').value.trim();
+  const data = document.getElementById('f-data').value;
+  const sv = pdvs.filter(d=>d.saved);
+  if(!sv.length) { showToast('⚠️ Salve pelo menos 1 PDV antes!','#ffc24a'); return; }
+
+  const record = {
+    id: Date.now(), data, supervisor:sup, vendedor:vend, rota,
+    pdvs: JSON.parse(JSON.stringify(sv)),
+    resultado: {
+      visitados:   sv.length,
+      positivados: sv.filter(d=>d.positivou==='S').length,
+      cadastros:   sv.filter(d=>d.cadastrou==='S').length,
+      venda:       sv.reduce((s,d)=>s+(+d.vlr||0),0),
+    },
+    obs: document.getElementById('r-obs').value,
+    feedback: { positivos: document.getElementById('f-positivos').value, desenvolver: document.getElementById('f-desenvolver').value }
+  };
+
+  // Salva local sempre
+  const db = getDB(); db.unshift(record); saveDB(db);
+
+  // Tenta enviar ao Google Sheets se URL configurada
+  const url = SHEETS_URL;
+  if(url) {
+    showToast('⏳ Enviando ao Google Sheets...','#0088ff');
+    try {
+      // Monta linhas — 1 linha por PDV
+      const rows = sv.map(p => ({
+        timestamp:    new Date().toISOString(),
+        data,
+        supervisor:   sup,
+        vendedor:     vend,
+        rota,
+        cliente_id:   p.clienteId,
+        cliente_nome: p.nomeCliente,
+        ramo:         p.ramo,
+        positivou:    p.positivou||'',
+        cadastrou:    p.cadastrou||'',
+        vlr_vendido:  p.vlr||0,          // valor INDIVIDUAL do PDV
+        mix:          (p.mix||[]).join('|'),
+        p1: p.passos.p1||'', p2: p.passos.p2||'', p3: p.passos.p3||'',
+        p4: p.passos.p4||'', p5: p.passos.p5||'', p6: p.passos.p6||'',
+        p7: p.passos.p7||'', p8: p.passos.p8||'', p9: p.passos.p9||'',
+        total_visitados:   record.resultado.visitados,
+        total_positivados: record.resultado.positivados,
+        total_cadastros:   record.resultado.cadastros,
+        total_venda:       '',            // em branco por PDV — total só no resumo
+        obs:               record.obs||'',
+        feedback_pos:      record.feedback.positivos||'',
+        feedback_dev:      record.feedback.desenvolver||'',
+      }));
+
+      // fetch POST direto — funciona de HTTPS (GitHub Pages) para Apps Script
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({rows})
+      }).then(() => {
+        console.log('✅ Enviado ao Google Sheets');
+      }).catch(e => {
+        console.error('❌ Erro Sheets:', e);
+      });
+      showToast('✅ Salvo e enviado ao Google Sheets!');
+    } catch(e) {
+      showToast('⚠️ Salvo local. Falha no Sheets: '+e.message,'#ffc24a');
+    }
+  } else {
+    showToast('✅ Salvo localmente! Configure o Sheets em ⚙️ para sincronizar.');
+  }
+  limparFormulario();
+}
+
+function limparFormulario() {
+  ['f-supervisor','f-vendedor','f-rota','r-obs','f-positivos','f-desenvolver'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  initPdvs(); cur=0; renderNav(); renderPdv(0); updateAuto();
+}
+
+// ---- SYNC DO GOOGLE SHEETS → localStorage ----
+async function sincronizarSheets() {
+  const url = localStorage.getItem('coaching_sheets_url');
+  if(!url) return;
+  try {
+    // Busca dados via GET — Apps Script retorna texto simples com os dados
+    const getUrl = url.replace('/exec', '/exec') + '?action=getAll';
+    const resp = await fetch(getUrl, { method: 'GET', mode: 'cors' });
+    if(!resp.ok) return;
+    const text = await resp.text();
+    if(!text || text.startsWith('MAR Foods')) return; // resposta padrão sem dados
+    const sheetsData = JSON.parse(text);
+    if(!sheetsData || !sheetsData.records) return;
+    // Mescla com localStorage — evita duplicatas pelo ID
+    const local = getDB();
+    const localIds = new Set(local.map(r=>r.id+''));
+    const novos = sheetsData.records.filter(r => !localIds.has(r.id+''));
+    if(novos.length > 0) {
+      saveDB([...novos, ...local]);
+      console.log('✅ Sincronizados', novos.length, 'registros do Sheets');
+    }
+  } catch(e) {
+    console.log('Sync Sheets (não crítico):', e.message);
+  }
+}
+
+// ---- DASHBOARD ----
+let _charts = {};
+function destroyChart(id){ if(_charts[id]){_charts[id].destroy();delete _charts[id];} }
+
+function mkChart(id, type, labels, datasets, opts={}) {
+  destroyChart(id);
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  _charts[id] = new Chart(ctx, {
+    type, data:{labels, datasets},
+    options:{
+      responsive:true, plugins:{legend:{labels:{color:'#7a8599',font:{family:'DM Sans'}}}},
+      scales:{
+        x:{ticks:{color:'#7a8599',font:{family:'DM Sans'}}, grid:{color:'#2a3040'}},
+        y:{ticks:{color:'#7a8599',font:{family:'DM Sans'}}, grid:{color:'#2a3040'}, beginAtZero:true, ...( opts.yMax?{max:opts.yMax}:{} )}
+      },
+      ...opts.extra
+    }
+  });
+}
+
+async function renderDashboard() {
+  const all = getDB();
+  const sf   = document.getElementById('dash-supervisor').value;
+  const vf   = document.getElementById('dash-vendedor').value;
+  const mes  = document.getElementById('dash-mes').value;
+  const dataF= document.getElementById('dash-data').value;
+  const dias = +document.getElementById('dash-periodo').value;
+
+  const sSel=document.getElementById('dash-supervisor'),curS=sSel.value;
+  sSel.innerHTML='<option value="">Todos</option>'+[...new Set(all.map(r=>r.supervisor))].sort().map(v=>`<option ${v===curS?'selected':''} value="${v}">${v}</option>`).join('');
+  
+  // Vendedor: filtra pelos relativos ao supervisor selecionado
+  const vSel=document.getElementById('dash-vendedor'),curV=vSel.value;
+  const vendedoresFiltrados = sf 
+    ? [...new Set(all.filter(r=>r.supervisor===sf).map(r=>r.vendedor))].sort()
+    : [...new Set(all.map(r=>r.vendedor))].sort();
+  vSel.innerHTML='<option value="">Todos</option>'+vendedoresFiltrados.map(v=>`<option ${v===curV?'selected':''} value="${v}">${v}</option>`).join('');
+
+  let recs = all;
+  if(sf)    recs=recs.filter(r=>r.supervisor===sf);
+  if(vf)    recs=recs.filter(r=>r.vendedor===vf);
+  if(dataF) recs=recs.filter(r=>r.data===dataF);
+  else if(mes) recs=recs.filter(r=>(r.data||'').slice(5,7)===mes);
+  else if(dias>0){const cut=new Date();cut.setDate(cut.getDate()-dias);recs=recs.filter(r=>new Date(r.data)>=cut);}
+
+  if(!recs.length){
+    document.getElementById('dash-metrics').innerHTML='<p style="color:var(--muted);grid-column:1/-1">Nenhum dado no período.</p>';
+    document.getElementById('dash-passos').innerHTML='';
+    document.getElementById('dash-mix').innerHTML='';
+    ['chart-conv','chart-visit','chart-posit','chart-dias','chart-ramo','chart-rotas'].forEach(destroyChart);
+    return;
+  }
+
+  // Todos os PDVs achatados para cálculos
+  const allPdvs = recs.flatMap(r=>r.pdvs.map(p=>({...p,_data:r.data,_sup:r.supervisor,_vend:r.vendedor,_rota:r.rota})));
+  window._drillPdvs = allPdvs;
+
+  const tv     = recs.reduce((s,r)=>s+(r.resultado?.visitados||1),0);
+  const tp     = recs.reduce((s,r)=>s+(r.resultado?.positivados||0),0);
+  const tvenda = allPdvs.reduce((s,p)=>s+(+p.vlr||0),0);
+  const tc     = recs.reduce((s,r)=>s+(r.resultado?.cadastros||0),0);
+  const taxP   = tv>0?(tp/tv*100).toFixed(1):0;
+  const nRotas = [...new Set(recs.map(r=>r.data+'|'+r.supervisor+'|'+r.vendedor+'|'+r.rota))].length;
+  const mediaXRota = nRotas>0?(tv/nRotas).toFixed(1):0;
+
+  // Calcula taxa de adesão 9 passos com pesos (E=100%, P=50%, N=0%)
+  const pcTmp={};PASSOS.forEach(p=>{pcTmp[p.id]={E:0,P:0,N:0,pts:0,maxPts:0};});
+  allPdvs.forEach(pdv=>PASSOS.forEach(p=>{
+    const v=pdv.passos&&pdv.passos[p.id];
+    if(v==='E'||v==='P'||v==='N'||v==='S'){
+      pcTmp[p.id].maxPts+=p.peso;
+      if(v==='E'||v==='S'){pcTmp[p.id].E++;pcTmp[p.id].pts+=p.peso;}
+      else if(v==='P'){pcTmp[p.id].P++;pcTmp[p.id].pts+=p.peso*0.5;}
+      else{pcTmp[p.id].N++;}
+    }
+  }));
+  const passosMaxPts=PASSOS.reduce((s,p)=>s+pcTmp[p.id].maxPts,0);
+  const passosRealPts=PASSOS.reduce((s,p)=>s+pcTmp[p.id].pts,0);
+  const taxaPassos=passosMaxPts>0?Math.round(passosRealPts/passosMaxPts*100):0;
+
+  // Calcula taxa de adesão mix
+  const ramosAll=[...new Set(allPdvs.map(p=>p.ramo).filter(Boolean))];
+  let mixChk=0,mixTot=0;
+  ramosAll.forEach(ramo=>{const m=MIX[ramo];if(!m)return;const pR=allPdvs.filter(p=>p.ramo===ramo);mixTot+=pR.length*m.items.length;mixChk+=pR.reduce((s,p)=>s+(p.mix||[]).length,0);});
+  const taxaMix=mixTot>0?Math.round(mixChk/mixTot*100):0;
+  const taxaTotal=Math.round((taxaPassos*2+taxaMix)/3);  // peso 2 passos : 1 mix
+
+  // Salva recs globalmente para uso no ranking e drilldown
+  window._recsGlobal = recs;
+
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric-card" style="--c:var(--accent);cursor:pointer" onclick="abrirDrilldown('visitados')">
+      <div class="m-label">PDVs Visitados</div><div class="m-val">${tv}</div>
+      <div class="m-sub">${recs.length} registros <span style="color:var(--accent);font-size:.7rem">▶ ver detalhes</span></div></div>
+    <div class="metric-card" style="--c:#0088ff;cursor:pointer" onclick="abrirDrilldown('positivados')">
+      <div class="m-label">PDVs Positivados</div><div class="m-val">${tp}</div>
+      <div class="m-sub">Taxa: ${taxP}% <span style="color:#0088ff;font-size:.7rem">▶ ver detalhes</span></div></div>
+    <div class="metric-card" style="--c:var(--warn);cursor:pointer" onclick="abrirDrilldown('vendas')">
+      <div class="m-label">Total Vendas</div><div class="m-val">R$${tvenda.toLocaleString('pt-BR')}</div>
+      <div class="m-sub">Média R$${nRotas?(tvenda/nRotas).toFixed(0):0}/rota <span style="color:var(--warn);font-size:.7rem">▶ ver detalhes</span></div></div>
+    <div class="metric-card" style="--c:var(--danger);cursor:pointer" onclick="abrirDrilldown('cadastros')">
+      <div class="m-label">Cadastros</div><div class="m-val">${tc}</div>
+      <div class="m-sub">Em ${recs.length} registros <span style="color:var(--danger);font-size:.7rem">▶ ver detalhes</span></div></div>
+    <div class="metric-card" style="--c:#a064ff;cursor:pointer" onclick="abrirDrilldown('rotas')">
+      <div class="m-label">Rotas Realizadas</div><div class="m-val" style="color:#a064ff">${nRotas}</div>
+      <div class="m-sub">${[...new Set(recs.map(r=>r.vendedor))].length} vendedor(es) <span style="color:#a064ff;font-size:.7rem">▶ ver detalhes</span></div></div>
+    <div class="metric-card" style="--c:#00c8ff">
+      <div class="m-label">PDVs × Rota</div><div class="m-val" style="color:#00c8ff">${mediaXRota}</div>
+      <div class="m-sub">Média de PDVs por rota</div></div>
+    <div class="metric-card" style="--c:#00e5a0">
+      <div class="m-label">Adesão 9 Passos</div><div class="m-val" style="color:${taxaPassos>=80?'var(--accent)':taxaPassos>=50?'var(--warn)':'var(--danger)'}">${taxaPassos}%</div>
+      <div class="m-sub">Taxa acumulada geral</div></div>
+    <div class="metric-card" style="--c:#ffc24a">
+      <div class="m-label">Adesão Mix Ideal</div><div class="m-val" style="color:${taxaMix>=80?'var(--accent)':taxaMix>=50?'var(--warn)':'var(--danger)'}">${taxaMix}%</div>
+      <div class="m-sub">Taxa acumulada geral</div></div>
+    <div class="metric-card" style="--c:#ff4d6d">
+      <div class="m-label">Taxa de Adesão Total</div><div class="m-val" style="color:${taxaTotal>=80?'var(--accent)':taxaTotal>=50?'var(--warn)':'var(--danger)'}">${taxaTotal}%</div>
+      <div class="m-sub">Passos + Mix combinados</div></div>`;
+
+  // Passos — usa PDVs individuais
+  const pc={};PASSOS.forEach(p=>{pc[p.id]={E:0,P:0,N:0,pts:0,maxPts:0};});
+  allPdvs.forEach(pdv=>PASSOS.forEach(p=>{
+    const v=pdv.passos&&pdv.passos[p.id];
+    if(v==='E'||v==='P'||v==='N'||v==='S'){
+      pc[p.id].maxPts+=p.peso;
+      if(v==='E'||v==='S'){pc[p.id].E++;pc[p.id].pts+=p.peso;}
+      else if(v==='P'){pc[p.id].P++;pc[p.id].pts+=p.peso*0.5;}
+      else{pc[p.id].N++;}
+    }
+  }));
+  document.getElementById('dash-passos').innerHTML=PASSOS.map(p=>{
+    const c=pc[p.id]; if(c.maxPts===0) return '';
+    const pct=Math.round(c.pts/c.maxPts*100);
+    const col=pct>=80?'var(--accent)':pct>=50?'var(--warn)':'var(--danger)';
+    const avaliados=c.E+c.P+c.N;
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.84rem">${p.lbl} — ${p.title}</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:${col}">${pct}% <span style="font-size:.7rem;font-weight:400;color:var(--muted)">(peso ${p.peso})</span></span></div>
+      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%;background:${col}"></div></div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${c.E} executou / ${c.P} parcial / ${c.N} não executou / ${avaliados} avaliados</div>
+    </div>`;}).join('')||'<p style="color:var(--muted)">Sem dados.</p>';
+
+  // Mix
+  const ramosUsados=[...new Set(allPdvs.map(p=>p.ramo).filter(Boolean))];
+  document.getElementById('dash-mix').innerHTML = !ramosUsados.length ? '<p style="color:var(--muted)">Sem dados.</p>' :
+    ramosUsados.map(ramo=>{
+      const m=MIX[ramo]; if(!m) return '';
+      const pdvsRamo=allPdvs.filter(p=>p.ramo===ramo);
+      const tot=pdvsRamo.length*m.items.length;
+      const chk=pdvsRamo.reduce((s,p)=>s+(p.mix||[]).length,0);
+      const pct=tot>0?Math.round(chk/tot*100):0;
+      const col=pct>=80?'var(--accent)':pct>=50?'var(--warn)':'var(--danger)';
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.84rem">${m.label}</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:${col}">${pct}%</span></div>
+        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%;background:${col}"></div></div>
+        <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${chk}/${tot} itens | ${pdvsRamo.length} PDV(s)</div>
+      </div>`;}).join('');
+
+  const BAR_OPTS={borderRadius:6,borderSkipped:false};
+  const sups=[...new Set(recs.map(r=>r.supervisor))].sort();
+
+  // Visitas por Ramo
+  const todosRamos=[...new Set(allPdvs.map(p=>p.ramo).filter(Boolean))].sort();
+  const ramoCores=['rgba(0,229,160,.75)','rgba(0,136,255,.75)','rgba(255,194,74,.75)','rgba(255,77,109,.75)','rgba(160,100,255,.75)'];
+  mkChart('chart-ramo','bar',todosRamos,[{label:'Visitas',data:todosRamos.map(r=>allPdvs.filter(p=>p.ramo===r).length),backgroundColor:todosRamos.map((_,i)=>ramoCores[i%ramoCores.length]),borderWidth:1,...BAR_OPTS}]);
+
+  // Rotas por Supervisor (cada linha da planilha = 1 rota)
+  const supRotas=sups.map(s=>recs.filter(r=>r.supervisor===s).length);
+  mkChart('chart-rotas','bar',sups,[{label:'Rotas',data:supRotas,backgroundColor:'rgba(160,100,255,.75)',borderColor:'#a064ff',borderWidth:1,...BAR_OPTS}]);
+
+  // Conversão por Supervisor
+  const supVisit=sups.map(s=>recs.filter(r=>r.supervisor===s).reduce((a,r)=>a+(r.resultado?.visitados||0),0));
+  const supPosit=sups.map(s=>recs.filter(r=>r.supervisor===s).reduce((a,r)=>a+(r.resultado?.positivados||0),0));
+  const supConv=sups.map((s,i)=>supVisit[i]>0?+(supPosit[i]/supVisit[i]*100).toFixed(1):0);
+  mkChart('chart-conv','bar',sups,[{label:'Taxa Conversão (%)',data:supConv,backgroundColor:'rgba(0,229,160,.75)',borderColor:'#00e5a0',borderWidth:1,...BAR_OPTS}],{yMax:100});
+  mkChart('chart-visit','bar',sups,[{label:'PDVs Visitados',data:supVisit,backgroundColor:'rgba(0,136,255,.75)',borderColor:'#0088ff',borderWidth:1,...BAR_OPTS}]);
+  mkChart('chart-posit','bar',sups,[{label:'PDVs Positivados',data:supPosit,backgroundColor:'rgba(255,194,74,.75)',borderColor:'#ffc24a',borderWidth:1,...BAR_OPTS}]);
+
+  // Visitas por Dia
+  const diasMap={};
+  recs.forEach(r=>{diasMap[r.data]=(diasMap[r.data]||0)+(r.resultado?.visitados||1);});
+  const diasOrd=Object.keys(diasMap).sort();
+  mkChart('chart-dias','bar',diasOrd.map(d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})),[{label:'PDVs Visitados',data:diasOrd.map(d=>diasMap[d]),backgroundColor:'rgba(255,77,109,.7)',borderColor:'#ff4d6d',borderWidth:1,...BAR_OPTS}]);
+}
+
+// ---- DRILLDOWN ----
+function abrirDrilldown(tipo) {
+  const pdvs = window._drillPdvs || [];
+  let titulo='', thead='', rows=[];
+
+  if(tipo==='visitados') {
+    titulo='📋 PDVs Visitados';
+    thead=`<tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>ID</th><th>Cliente</th><th>Ramo</th><th>Visitas</th></tr>`;
+    rows=pdvs.map(p=>`<tr><td>${p._data||'-'}</td><td>${p._sup||'-'}</td><td>${p._vend||'-'}</td><td>${p.clienteId||'-'}</td><td>${p.nomeCliente||'-'}</td><td>${p.ramo||'-'}</td><td>1</td></tr>`);
+  } else if(tipo==='rotas') {
+    titulo='🗺️ Rotas Realizadas';
+    thead=`<tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>Rota</th><th>PDVs</th><th>Positiv.</th><th>Cadastros</th><th>Venda R$</th></tr>`;
+    const recs = window._recsGlobal || [];
+    // Agrupa por chave única de rota
+    const rotaMap = {};
+    recs.forEach(r => {
+      const key = r.data+'|'+r.supervisor+'|'+r.vendedor+'|'+r.rota;
+      if(!rotaMap[key]) rotaMap[key] = {data:r.data, supervisor:r.supervisor, vendedor:r.vendedor, rota:r.rota, pdvs:0, pos:0, cad:0, venda:0};
+      rotaMap[key].pdvs  += r.resultado?.visitados||1;
+      rotaMap[key].pos   += r.resultado?.positivados||0;
+      rotaMap[key].cad   += r.resultado?.cadastros||0;
+      rotaMap[key].venda += r.resultado?.venda||0;
+    });
+    rows = Object.values(rotaMap).sort((a,b)=>b.data.localeCompare(a.data)).map(r=>`<tr>
+      <td>${r.data||'-'}</td><td>${r.supervisor||'-'}</td><td>${r.vendedor||'-'}</td><td>${r.rota||'-'}</td>
+      <td>${r.pdvs}</td>
+      <td>${r.pos}</td>
+      <td>${r.cad}</td>
+      <td>${r.venda>0?'R$'+r.venda.toLocaleString('pt-BR'):'-'}</td>
+    </tr>`);
+  } else if(tipo==='positivados') {
+    titulo='✅ PDVs Positivados';
+    thead=`<tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>ID</th><th>Cliente</th><th>Ramo</th><th>Positivou</th></tr>`;
+    rows=pdvs.filter(p=>p.positivou==='S').map(p=>`<tr><td>${p._data||'-'}</td><td>${p._sup||'-'}</td><td>${p._vend||'-'}</td><td>${p.clienteId||'-'}</td><td>${p.nomeCliente||'-'}</td><td>${p.ramo||'-'}</td><td><span class="badge badge-green">Sim</span></td></tr>`);
+  } else if(tipo==='vendas') {
+    titulo='💰 PDVs com Venda';
+    thead=`<tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>ID</th><th>Cliente</th><th>Ramo</th><th>Vlr Vendido R$</th></tr>`;
+    rows=pdvs.filter(p=>+p.vlr>0).map(p=>`<tr><td>${p._data||'-'}</td><td>${p._sup||'-'}</td><td>${p._vend||'-'}</td><td>${p.clienteId||'-'}</td><td>${p.nomeCliente||'-'}</td><td>${p.ramo||'-'}</td><td>R$${(+p.vlr).toLocaleString('pt-BR')}</td></tr>`);
+  } else if(tipo==='cadastros') {
+    titulo='🆕 Cadastros Realizados';
+    thead=`<tr><th>Data</th><th>Supervisor</th><th>Vendedor</th><th>ID</th><th>Cliente</th><th>Ramo</th><th>Cadastrou</th></tr>`;
+    rows=pdvs.filter(p=>p.cadastrou==='S').map(p=>`<tr><td>${p._data||'-'}</td><td>${p._sup||'-'}</td><td>${p._vend||'-'}</td><td>${p.clienteId||'-'}</td><td>${p.nomeCliente||'-'}</td><td>${p.ramo||'-'}</td><td><span class="badge badge-green">Sim</span></td></tr>`);
+  }
+
+  document.getElementById('drilldown-title').textContent = titulo + ` (${rows.length})`;
+  document.getElementById('drilldown-thead').innerHTML = thead;
+  document.getElementById('drilldown-tbody').innerHTML = rows.join('') || '';
+  document.getElementById('drilldown-empty').style.display = rows.length ? 'none' : 'block';
+  document.getElementById('drilldown-overlay').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function fecharDrilldown() {
+  document.getElementById('drilldown-overlay').style.display = 'none';
+}
+
+// ---- HISTÓRICO ----
+function renderHistorico() {
+  let db=getDB();
+  const s=document.getElementById('hist-search').value.toLowerCase();
+  const df=document.getElementById('hist-data').value;
+  if(s) db=db.filter(r=>r.vendedor.toLowerCase().includes(s)||r.supervisor.toLowerCase().includes(s));
+  if(df) db=db.filter(r=>r.data===df);
+  document.getElementById('hist-empty').style.display=db.length?'none':'block';
+  document.getElementById('hist-tbody').innerHTML=db.map(r=>{
+    const pct=r.resultado.visitados>0?(r.resultado.positivados/r.resultado.visitados*100).toFixed(0):0;
+    const pOK=r.pdvs.reduce((s,p)=>s+Object.values(p.passos||{}).filter(v=>v==='E'||v==='S').length,0);
+    const pTot=r.pdvs.reduce((s,p)=>s+Object.keys(p.passos||{}).length,0);
+    const badge=pct>=70?'badge-green':pct>=40?'badge-warn':'badge-red';
+    return `<tr>
+      <td>${new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${r.supervisor}</td><td>${r.vendedor}</td><td>${r.rota||'-'}</td>
+      <td>${r.resultado.visitados}</td><td>${r.resultado.positivados}</td>
+      <td><span class="badge ${badge}">${pct}%</span></td>
+      <td>R$${Number(r.resultado.venda).toLocaleString('pt-BR')}</td>
+      <td>${r.resultado.cadastros}</td><td>${pOK}/${pTot}</td>
+      <td>
+        <button class="btn btn-secondary" style="padding:5px 11px;font-size:.77rem" onclick="verDetalhes(${r.id})">Ver</button>
+      </td>
+    </tr>`;}).join('');
+}
+
+function verDetalhes(id){
+  const r=getDB().find(x=>String(x.id)===String(id)); if(!r) return;
+  const rows=r.pdvs.map((p,i)=>`<tr>
+    <td>${i+1}</td>
+    <td>${p.clienteId||'-'}</td>
+    <td>${p.nomeCliente||'-'}</td>
+    <td>${p.ramo||'-'}</td>
+    <td>${p.positivou==='S'?'<span class="badge badge-green">Sim</span>':'<span class="badge badge-red">Não</span>'}</td>
+    <td>${p.cadastrou==='S'?'<span class="badge badge-green">Sim</span>':'-'}</td>
+    <td>${+p.vlr>0?'R$'+(+p.vlr).toLocaleString('pt-BR'):'-'}</td>
+    <td>${Object.values(p.passos||{}).filter(v=>v==='E'||v==='S').length}E / ${Object.values(p.passos||{}).filter(v=>v==='P').length}P / ${Object.values(p.passos||{}).filter(v=>v==='N').length}N</td>
+  </tr>`).join('');
+  document.getElementById('drilldown-title').innerHTML=`📋 ${r.data} — ${r.vendedor} | Rota: ${r.rota||'-'}`;
+  document.getElementById('drilldown-thead').innerHTML=`<tr><th>#</th><th>ID</th><th>Cliente</th><th>Ramo</th><th>Positivou</th><th>Cadastrou</th><th>Venda R$</th><th>Passos</th></tr>`;
+  document.getElementById('drilldown-tbody').innerHTML=rows;
+  document.getElementById('drilldown-empty').style.display=r.pdvs.length?'none':'block';
+  document.getElementById('drilldown-overlay').style.display='block';
+  window.scrollTo(0,0);
+}
+
+function exportarCSV(){
+  const db=getDB(); if(!db.length){showToast('Sem dados','var(--warn)');return;}
+  const cols=['Data','Supervisor','Vendedor','Rota','ID Cliente','Nome Cliente','Ramo','Visitados','Positivados','VendaR$','Cadastros','Observacoes da Rota','Pontos Positivos','Pontos a Desenvolver'];
+  const esc = v => `"${(String(v||'')).replace(/"/g,'""')}"`;
+  const rows=[];
+  db.forEach(r=>{
+    // 1 linha por PDV
+    (r.pdvs||[]).forEach(p=>{
+      rows.push([
+        r.data, r.supervisor, r.vendedor, r.rota||'',
+        p.clienteId||'', esc(p.nomeCliente), esc(p.ramo),
+        1, p.positivou==='S'?1:0, p.vlr||0, p.cadastrou==='S'?1:0,
+        esc(r.obs), esc(r.feedback?.positivos), esc(r.feedback?.desenvolver)
+      ].join(';'));
+    });
+  });
+  const blob=new Blob(['\uFEFF'+[cols.join(';'),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`rota_coaching_${new Date().toISOString().split('T')[0]}.csv`;a.click();
+  showToast('✅ CSV exportado!');
+}
+
+function showPage(name,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active'); tab.classList.add('active');
+  if(name==='cadastros') {
+    document.getElementById('cad-lock').style.display = 'flex';
+    document.getElementById('cad-content').style.display = 'none';
+    document.getElementById('cad-senha').value = '';
+    document.getElementById('cad-erro').style.display = 'none';
+    setTimeout(()=>document.getElementById('cad-senha').focus(), 100);
+  }
+  if(name==='dashboard') renderDashboard();
+  if(name==='ranking') renderRanking();
+  if(name==='historico') renderHistorico();
+  if(name==='config') {
+    document.getElementById('config-lock').style.display = 'flex';
+    document.getElementById('config-content').style.display = 'none';
+    document.getElementById('config-senha').value = '';
+    document.getElementById('senha-erro').style.display = 'none';
+    setTimeout(()=>document.getElementById('config-senha').focus(), 100);
+  }
+}
+
+function showToast(msg,bg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=bg||'var(--accent)';t.style.color=bg?'#fff':'#000';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function saveSheetsUrl() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  if(!url) { showToast('Cole a URL primeiro','#ffc24a'); return; }
+  localStorage.setItem('coaching_sheets_url', url);
+  document.getElementById('sheets-status').innerHTML = '<span style="color:var(--accent)">✅ URL salva com sucesso!</span>';
+  showToast('✅ URL do Google Sheets salva!');
+}
+
+async function testSheetsUrl() {
+  const url = localStorage.getItem('coaching_sheets_url');
+  if(!url) { showToast('Salve a URL primeiro','#ffc24a'); return; }
+  document.getElementById('sheets-status').innerHTML = '<span style="color:#0088ff">⏳ Testando conexão...</span>';
+  try {
+    await fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({rows:[], test:true}) });
+    document.getElementById('sheets-status').innerHTML = '<span style="color:var(--accent)">✅ Conexão OK! (modo no-cors — verifique sua planilha para confirmar)</span>';
+  } catch(e) {
+    document.getElementById('sheets-status').innerHTML = `<span style="color:var(--danger)">❌ Erro: ${e.message}</span>`;
+  }
+}
+
+// ---- SUPERVISORES ----
+const DEFAULT_SUPS_DATA = [
+  {name:'JACKSON',  senha:'C@xias26'},
+  {name:'LEONARDO', senha:'Leo2026'},
+  {name:'MURIEL',   senha:'Litor@al26'},
+  {name:'MOIZES',   senha:'SUL2026'},
+  {name:'JULIANO',  senha:'POA2026'},
+  {name:'CRISTIANO',senha:'Baccio2026'},
+];
+// supervisors stored as [{name,senha}] in localStorage
+function DEFAULT_SUPS() { return JSON.parse(JSON.stringify(DEFAULT_SUPS_DATA)); }
+
+function getSups() {
+  const saved = localStorage.getItem('coaching_supervisors');
+  if(saved) {
+    const parsed = JSON.parse(saved);
+    // migrate old string array to new {name,senha} format
+    if(parsed.length && typeof parsed[0]==='string') {
+      const migrated = parsed.map(n=>({name:n,senha:''}));
+      saveSups(migrated); return migrated;
+    }
+    return parsed;
+  }
+  return DEFAULT_SUPS();
+}
+function saveSups(list) { localStorage.setItem('coaching_supervisors', JSON.stringify(list)); }
+function getSupNames() { return getSups().map(s=>s.name); }
+
+function renderSupSelector() {
+  const sups = getSups();
+  const sel = document.getElementById('f-supervisor');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Selecione...</option>' + sups.map(s=>`<option value="${s.name}" ${s.name===cur?'selected':''}>${s.name}</option>`).join('');
+  sel.onchange = function() { renderVendedorSelect(); };
+  renderVendedorSelect();
+}
+
+function renderSupConfig() {
+  const sups = getSups();
+  document.getElementById('sup-list').innerHTML = sups.map((s,i)=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="flex:1;font-weight:600">${s.name}</span>
+        <button onclick="removeSupervisor(${i})" style="background:rgba(255,77,109,.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600">Remover</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="position:relative;flex:1">
+          <input type="password" id="senha-sup-${i}" placeholder="Nova senha..." value="${s.senha||''}"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 36px 7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none">
+          <button type="button" onclick="toggleSenhaVis('senha-sup-${i}',this)"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;line-height:1">👁</button>
+        </div>
+        <button onclick="alterarSenhaSup(${i})" style="background:rgba(0,229,160,.15);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600">Salvar Senha</button>
+      </div>
+    </div>`).join('');
+}
+
+function addSupervisor() {
+  const inp = document.getElementById('sup-new-input');
+  const senhaInp = document.getElementById('sup-new-senha');
+  const name = inp.value.trim().toUpperCase();
+  const senha = senhaInp ? senhaInp.value.trim() : '';
+  if(!name) return;
+  const list = getSups();
+  if(list.find(s=>s.name===name)) { showToast('Supervisor já existe','#ffc24a'); return; }
+  list.push({name, senha}); saveSups(list);
+  inp.value = ''; if(senhaInp) senhaInp.value = '';
+  renderSupConfig(); renderSupSelector();
+  showToast('✅ Supervisor adicionado!');
+}
+
+function toggleSenhaVis(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if(inp.type === 'password') { inp.type = 'text'; btn.style.opacity = '1'; }
+  else { inp.type = 'password'; btn.style.opacity = '0.5'; }
+}
+
+function alterarSenhaSup(idx) {
+  const nova = document.getElementById('senha-sup-'+idx).value.trim();
+  if(!nova) { showToast('Digite a nova senha','#ffc24a'); return; }
+  const list = getSups();
+  list[idx].senha = nova;
+  saveSups(list);
+  syncSupsToSheets((ok) => showToast(ok ? '✅ Senha salva na nuvem!' : '✅ Salvo local (sem conexão)'));
+  renderSupConfig();
+}
+
+function removeSupervisor(idx) {
+  if(!confirm('Remover este supervisor?')) return;
+  const list = getSups(); list.splice(idx,1); saveSups(list);
+  syncSupsToSheets(() => {});
+  renderSupConfig(); renderSupSelector(); initLogin();
+  showToast('Supervisor removido','var(--danger)');
+}
+
+// ---- SENHA CONFIG ----
+const CONFIG_SENHA = '12';
+function verificarSenhaCad() {
+  const v = document.getElementById('cad-senha').value;
+  if(v === 'COMERCI@ALMAR') {
+    document.getElementById('cad-lock').style.display = 'none';
+    document.getElementById('cad-content').style.display = 'block';
+    document.getElementById('cad-senha').value = '';
+    renderSupConfig(); renderRamoConfig();
+  } else {
+    document.getElementById('cad-erro').style.display = 'block';
+    document.getElementById('cad-senha').value = '';
+    setTimeout(()=>document.getElementById('cad-erro').style.display='none', 2000);
+  }
+}
+function bloquearCad() {
+  document.getElementById('cad-lock').style.display = 'flex';
+  document.getElementById('cad-content').style.display = 'none';
+}
+
+function verificarSenha() {
+  const v = document.getElementById('config-senha').value;
+  if(v === CONFIG_SENHA) {
+    document.getElementById('config-lock').style.display = 'none';
+    document.getElementById('config-content').style.display = 'block';
+    document.getElementById('config-senha').value = '';
+    document.getElementById('senha-erro').style.display = 'none';
+    const u = localStorage.getItem('coaching_sheets_url');
+    if(u) document.getElementById('sheets-url-input').value = u;
+    renderSupConfig(); renderRamoConfig();
+  } else {
+    document.getElementById('senha-erro').style.display = 'block';
+    document.getElementById('config-senha').value = '';
+  }
+}
+function bloquearConfig() {
+  document.getElementById('config-lock').style.display = 'flex';
+  document.getElementById('config-content').style.display = 'none';
+}
+
+// ---- RAMOS ----
+function renderRamoConfig() {
+  MIX = getMIX();
+  document.getElementById('ramo-list').innerHTML = Object.entries(MIX).map(([key, m])=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="flex:1;font-weight:700">${key}</span>
+        <span style="font-size:.75rem;color:var(--muted)">${m.label}</span>
+        <button onclick="removeRamo('${key}')" style="background:rgba(255,77,109,.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600">Remover</button>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted)">Mix: ${m.items.map(i=>i.v).join(' • ')}</div>
+    </div>`).join('');
+}
+
+function addRamo() {
+  const nome = document.getElementById('ramo-new-name').value.trim().toUpperCase();
+  const itensRaw = document.getElementById('ramo-new-items').value.trim();
+  if(!nome || !itensRaw) { showToast('Preencha nome e itens do ramo','#ffc24a'); return; }
+  const mix = getMIX();
+  if(mix[nome]) { showToast('Ramo já existe','#ffc24a'); return; }
+  const items = itensRaw.split(',').map((v,i)=>({ k: v.trim().substring(0,4).toUpperCase().replace(/\s/g,''), v: v.trim() }));
+  mix[nome] = { label: 'Mix '+nome.charAt(0)+nome.slice(1).toLowerCase(), items };
+  saveMIX(mix); MIX = mix;
+  document.getElementById('ramo-new-name').value = '';
+  document.getElementById('ramo-new-items').value = '';
+  syncRamosToSheets((ok) => showToast(ok ? '✅ Ramo salvo na nuvem!' : '✅ Salvo local (sem conexão)'));
+  renderRamoConfig();
+}
+
+function removeRamo(key) {
+  if(!confirm(`Remover o ramo "${key}" e seu mix?`)) return;
+  const mix = getMIX();
+  delete mix[key]; saveMIX(mix); MIX = mix;
+  syncRamosToSheets(() => {});
+  renderRamoConfig();
+  showToast('Ramo removido','var(--danger)');
+}
+
+// ---- RANKING ----
+function calcAdesao(registros) {
+  const pdvs = registros.flatMap(r=>r.pdvs||[]);
+  // 9 Passos
+  let pPts=0,pMax=0;
+  pdvs.forEach(pdv=>PASSOS.forEach(p=>{
+    const v=pdv.passos&&pdv.passos[p.id];
+    if(v==='E'||v==='P'||v==='N'||v==='S'){
+      pMax+=p.peso;
+      if(v==='E'||v==='S')pPts+=p.peso;
+      else if(v==='P')pPts+=p.peso*0.5;
+    }
+  }));
+  const taxaPassos=pMax>0?Math.round(pPts/pMax*100):0;
+  // Mix
+  let mChk=0,mTot=0;
+  const ramosAll=[...new Set(pdvs.map(p=>p.ramo).filter(Boolean))];
+  ramosAll.forEach(ramo=>{const m=MIX[ramo];if(!m)return;const pR=pdvs.filter(p=>p.ramo===ramo);mTot+=pR.length*m.items.length;mChk+=pR.reduce((s,p)=>s+(p.mix||[]).length,0);});
+  const taxaMix=mTot>0?Math.round(mChk/mTot*100):0;
+  const taxaTotal=Math.round((taxaPassos*2+taxaMix)/3);  // peso 2 passos : 1 mix
+  return {taxaPassos, taxaMix, taxaTotal};
+}
+
+function renderRanking() {
+  const all = getDB();
+  const sf   = document.getElementById('rank-supervisor')?.value || '';
+  const vf   = document.getElementById('rank-vendedor')?.value || '';
+  const mes  = document.getElementById('rank-mes')?.value || '';
+  const dataF= document.getElementById('rank-data')?.value || '';
+  const dias = +(document.getElementById('rank-periodo')?.value || 30);
+
+  // Update dropdowns
+  const sSel = document.getElementById('rank-supervisor');
+  const curS = sSel?.value || '';
+  if(sSel) sSel.innerHTML='<option value="">Todos</option>'+[...new Set(all.map(r=>r.supervisor))].sort().map(v=>`<option ${v===curS?'selected':''} value="${v}">${v}</option>`).join('');
+  const vSel = document.getElementById('rank-vendedor');
+  const curV = vSel?.value || '';
+  const vendsFiltrados = sf ? [...new Set(all.filter(r=>r.supervisor===sf).map(r=>r.vendedor))].sort() : [...new Set(all.map(r=>r.vendedor))].sort();
+  if(vSel) vSel.innerHTML='<option value="">Todos</option>'+vendsFiltrados.map(v=>`<option ${v===curV?'selected':''} value="${v}">${v}</option>`).join('');
+
+  let recs = all;
+  if(sf)    recs=recs.filter(r=>r.supervisor===sf);
+  if(vf)    recs=recs.filter(r=>r.vendedor===vf);
+  if(dataF) recs=recs.filter(r=>r.data===dataF);
+  else if(mes) recs=recs.filter(r=>(r.data||'').slice(5,7)===mes);
+  else if(dias>0){const cut=new Date();cut.setDate(cut.getDate()-dias);recs=recs.filter(r=>new Date(r.data)>=cut);}
+
+  function buildRankHtml(grupo) {
+    return grupo.sort((a,b)=>b.taxaTotal-a.taxaTotal).map((g,i)=>{
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}°`;
+      const col = g.taxaTotal>=80?'var(--accent)':g.taxaTotal>=50?'var(--warn)':'var(--danger)';
+      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:1.3rem">${medal}</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;flex:1">${g.nome}</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:${col}">${g.taxaTotal}%</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:var(--surface);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-size:.7rem;color:var(--muted);margin-bottom:2px">9 PASSOS</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;color:${g.taxaPassos>=80?'var(--accent)':g.taxaPassos>=50?'var(--warn)':'var(--danger)'}">${g.taxaPassos}%</div>
+          </div>
+          <div style="background:var(--surface);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-size:.7rem;color:var(--muted);margin-bottom:2px">MIX IDEAL</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;color:${g.taxaMix>=80?'var(--accent)':g.taxaMix>=50?'var(--warn)':'var(--danger)'}">${g.taxaMix}%</div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:.72rem;color:var(--muted)">Adesão Total</span><span style="font-size:.72rem;font-weight:700;color:${col}">${g.taxaTotal}%</span></div>
+          <div style="background:var(--surface);border-radius:4px;height:5px"><div style="height:5px;border-radius:4px;background:${col};width:${g.taxaTotal}%"></div></div>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:6px">${g.rotas} rota(s) | ${g.pdvs} PDV(s)</div>
+      </div>`;
+    }).join('') || '<p style="color:var(--muted)">Sem dados.</p>';
+  }
+
+  // Por Supervisor
+  const sups = [...new Set(recs.map(r=>r.supervisor))].sort();
+  const rankSup = sups.map(s=>{
+    const r = recs.filter(x=>x.supervisor===s);
+    const a = calcAdesao(r);
+    return {...a, nome:s, rotas:[...new Set(r.map(x=>x.data+'|'+x.rota))].length, pdvs:r.reduce((t,x)=>t+(x.resultado?.visitados||1),0)};
+  });
+  document.getElementById('rank-supervisor-list').innerHTML = buildRankHtml(rankSup);
+
+  // Por Vendedor
+  const vends = [...new Set(recs.map(r=>r.vendedor))].sort();
+  const rankVend = vends.map(v=>{
+    const r = recs.filter(x=>x.vendedor===v);
+    const a = calcAdesao(r);
+    return {...a, nome:v, rotas:[...new Set(r.map(x=>x.data+'|'+x.rota))].length, pdvs:r.reduce((t,x)=>t+(x.resultado?.visitados||1),0)};
+  });
+  document.getElementById('rank-vendedor-list').innerHTML = buildRankHtml(rankVend);
+}
+function zerarDadosTeste() {
+  const confirmMsg = 'Tem certeza que deseja ZERAR todos os dados de teste?\n\n⚠️ Esta ação remove todos os registros locais e NÃO pode ser desfeita.\n\nDigite "ZERAR" para confirmar:';
+  const resp = prompt(confirmMsg);
+  if(resp !== 'ZERAR') {
+    showToast('Operação cancelada.', '#7a8599');
+    return;
+  }
+  // Remove apenas os dados de registro — mantém configurações (URL, supervisores, ramos, senha)
+  localStorage.removeItem('coaching_db');
+  showToast('✅ Dados de teste zerados! App pronto para uso real.', 'var(--accent)');
+  // Atualiza contadores do formulário
+  updateAuto();
+}
+
+// ---- ATUALIZAR DASHBOARD DO GOOGLE SHEETS ----
+function atualizarDoSheets() {
+  const btn = document.getElementById('btn-refresh');
+  btn.textContent = '⏳ Buscando...';
+  btn.disabled = true;
+
+  const cbName = 'cb_' + Date.now();
+  const script = document.createElement('script');
+  const timer = setTimeout(() => {
+    showToast('⚠️ Tempo esgotado. Verifique a conexão.','#ffc24a');
+    btn.textContent = '🔄 Atualizar Planilha'; btn.disabled = false;
+    delete window[cbName]; if(script.parentNode) script.parentNode.removeChild(script);
+  }, 15000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timer);
+    delete window[cbName]; if(script.parentNode) script.parentNode.removeChild(script);
+    btn.textContent = '🔄 Atualizar Planilha'; btn.disabled = false;
+    if(data && data.status === 'ok' && data.records && data.records.length > 0) {
+      // Substitui COMPLETAMENTE o localStorage pelos dados do Sheets
+      localStorage.setItem('coaching_db', JSON.stringify(data.records));
+      showToast('✅ ' + data.records.length + ' registros carregados da planilha!');
+      renderDashboard();
+    } else {
+      showToast('⚠️ Sem dados ou erro no retorno.','#ffc24a');
+      console.log('Retorno:', JSON.stringify(data));
+    }
+  };
+
+  script.onerror = function() {
+    clearTimeout(timer);
+    delete window[cbName];
+    btn.textContent = '🔄 Atualizar Planilha'; btn.disabled = false;
+    showToast('❌ Erro ao conectar com a planilha.','var(--danger)');
+  };
+
+  script.src = SHEETS_URL + '?action=getAll&callback=' + cbName;
+  document.head.appendChild(script);
+}
+
+
+// ---- VENDEDORES POR SUPERVISOR ----
+const DEFAULT_VENDORS = {
+  "CRISTIANO": ["ALESSANDRO RAMOS DA SILVA","CRISTIANO SERPA DA SILVA","FABIO SCOTTI","WHOCHINTHON DE AVILA SILVA"],
+  "JACKSON": ["AGDA APARECIDA PINTO NUNES","ALEXANDRE MONTEIRO CHALUB","ANDREA FRANCIELI TONET","ANDREIA LOPES LEONCIO","CAMILA BIOLO PEREIRA","CASSIO LUNKES","DACLE GARCIA DOS REIS","ENDRYU DANIEL PIRES DE MENEZES","EVANDRO DA COSTA MARTINS","FABRICIO BRANCHER","FERNANDO MOURA DA SILVEIRA","HENRIK VON MUHLEN","HENRY AMARAL RANKRAPES","JACKSON MEDEIROS ADRIANO","JONAS REUS DO CANTO SOARES","JOSE CARLOS KLOCK","KRISTIELLE VELLOSO TEIXEIRA","RODRIGO DA SILVA PEREIRA","SIDIMAR LUIS DA SILVA MONDO","TAILOR WINTER","TATIANA LACERDA BACELLAR","ULISES DIEGO BERTOLDO"],
+  "JULIANO": ["ALDROVANDO JESUS GONCALVES","ARIANE DOS SANTOS QUEBAO","CIBELE NUNES LOPES","DOUGLAS MONTAGNA DUARTE","ELISIANE CARVALHO LAMBRECHTT","GIANFRANCISCO SILVA MENDES","GUILHERME JUHLIANO MACHADO","HENRIQUE DA ROSA GODINHO","JOSIMERI CRISTINA SOARES","JRV TRATAMENTO DE DADOS","JULIANO CARLOS LAUSE","LAUREN VITORIA NUNES SEVERO","LEONARDO DORNELES","LUIS FELIPE RODUIT","LUIZ ALBERTO ENGELKE","MAURICIO KEENAN VENTURA","MOACIR LOPES SILVA","NEI XAVIER GUATIMOSIM","PAULO RICARDO BECKER PINHEIRO","RICARDO MENEZES","ROBERTO RODRIGUES GARRONI","ROGER ANDERSON DOS SANTOS BERGMULLER"],
+  "LEONARDO": ["ALEXANDRE SILVA ALVES","DAILINE RYCHIK","DIONIS JOSE MUSTARDEIRO","FERNANDO SOARES DE AZEVEDO","FRANCIELE KNOPKA PARANHOS","GABRIELA DOS SANTOS","GISLAINE MULLER WINTER","JUAREZ ANTONIO MACIEL DA CUNHA","LEONARDO BARBOSA ANGELI","LEONARDO HENRIQUE LAMBRECHTT","MATHEUS ELIAS SCHERER","NATALIA BOMBARDELLI VANZELLA","ODILEI MARCIANO DOS SANTOS","RAQUEL RICARDO","RENATA POETA RAMOS","VICTOR HUGO FERREIRA STOFFEL"],
+  "MOIZES": ["ANAINA SCHMIDT ARGOUT","ANNA LIVIA LISBOA","ARLECIO LINDEMANN DEVANTIER","EDSON LUIZ AQUINO PERES","FRANCIELE DE VARGAS COUTO","ILTON ARMINDO BUTTOW","JAIRO COSTA PAIVA","JESSIENE GIOVANA BARTZ ARAUJO","LARISSA DE MOURA ANDRADE VERGARA","MARCELO DE SOUZA MARTINS","RITA DE CASSIA SOUZA PEPE","ROBSON PEREIRA DOS SANTOS","ROSE - NELVAIRA GONCALVES DOS SANTOS","TIAGO AYRES KOSZENIEWSKI","TIMOTEO HELLWIG LIERMANN","VITOR AMADEU BOTELHO ANANA","VIVIANE BOTELHO","VOLNEI KLUG"],
+  "MURIEL": ["ALEXSANDRO SILVEIRA DA CUNHA","ANA PAULA SCOTTI","BRUNO SANTOS DE OLIVEIRA","CARLOS ROSMANE SILVEIRA BELEM","EDUARDA SILVA DE FIGUEIREDO","EMERSON DE MATOS SOARES","JONATHAS BAPTISTA BOROWSKI","LETICIA GUAZZELLI MARTINS","MAIQUEL JULIANI DE ALMEIDA","MURIEL DE OLIVEIRA FARIAS","PAULO RENATO MORAES","TIAGO RAFAEL SALES","VINICIOS DA LUZ HAHN"]
+};
+
+function getVendors(sup) {
+  if(!sup) return [];
+  const key = 'vendors_' + sup;
+  const saved = localStorage.getItem(key);
+  if(saved) return JSON.parse(saved);
+  // First access: load defaults
+  const defs = DEFAULT_VENDORS[sup] || [];
+  localStorage.setItem(key, JSON.stringify(defs));
+  return defs;
+}
+function saveVendors(sup, list) {
+  localStorage.setItem('vendors_' + sup, JSON.stringify(list));
+}
+
+function renderVendedorSelect() {
+  const sup = document.getElementById('f-supervisor').value;
+  const sel = document.getElementById('f-vendedor');
+  const cur = sel.value;
+  const vendors = getVendors(sup);
+  sel.innerHTML = '<option value="">Selecione o vendedor...</option>' +
+    vendors.map(v => `<option value="${v}" ${v===cur?'selected':''}>${v}</option>`).join('');
+}
+
+function abrirCadVendedores() {
+  const sup = _loggedSupervisor || document.getElementById('f-supervisor').value;
+  if(!sup) { showToast('Faça login primeiro para gerenciar seus vendedores','#ffc24a'); return; }
+  document.getElementById('vend-modal-sup').textContent = 'Supervisor: ' + sup;
+  renderVendList(sup);
+  document.getElementById('vend-modal').style.display = 'flex';
+}
+function salvarVendedoresNuvem() {
+  const sup = _loggedSupervisor || document.getElementById('f-supervisor').value;
+  if(!sup) return;
+  syncVendToSheets(sup, (ok) => showToast(ok ? '☁️ Vendedores salvos na nuvem!' : '⚠️ Erro ao salvar. Tente novamente.', ok ? 'var(--accent)' : 'var(--danger)'));
+}
+
+function fecharCadVendedores() {
+  document.getElementById('vend-modal').style.display = 'none';
+}
+function renderVendList(sup) {
+  const list = getVendors(sup);
+  document.getElementById('vend-list').innerHTML = list.map((v,i) => `
+    <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px">
+      <span style="flex:1;font-size:.88rem">${v}</span>
+      <button onclick="removeVendedor('${sup}',${i})" style="background:rgba(255,77,109,.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:.78rem;font-weight:600">✕</button>
+    </div>`).join('') || '<p style="color:var(--muted);font-size:.85rem">Nenhum vendedor cadastrado.</p>';
+}
+function addVendedor() {
+  const sup = _loggedSupervisor || document.getElementById('f-supervisor').value;
+  const inp = document.getElementById('vend-new-input');
+  const name = inp.value.trim().toUpperCase();
+  if(!name || !sup) return;
+  const list = getVendors(sup);
+  if(list.includes(name)) { showToast('Vendedor já existe','#ffc24a'); return; }
+  list.push(name); saveVendors(sup, list);
+  inp.value = '';
+  syncVendToSheets(sup, (ok) => showToast(ok ? '✅ Vendedor salvo na nuvem!' : '✅ Salvo local (sem conexão)'));
+  renderVendList(sup);
+  renderVendedorSelect();
+}
+function removeVendedor(sup, idx) {
+  if(!confirm('Remover este vendedor?')) return;
+  const list = getVendors(sup);
+  list.splice(idx, 1); saveVendors(sup, list);
+  syncVendToSheets(sup, () => {});
+  renderVendList(sup);
+  renderVendedorSelect();
+  showToast('Vendedor removido','var(--danger)');
+}
+
+
+// ---- CLOUD SYNC (Sheets como banco central) ----
+// Toda comunicação via JSONP (GET) — funciona em qualquer navegador sem CORS
+function jsonpGet(url, cb) {
+  const name = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  const script = document.createElement('script');
+  const timer = setTimeout(() => { cleanup(); cb(null); }, 12000);
+  window[name] = (data) => { clearTimeout(timer); cleanup(); cb(data); };
+  script.onerror = () => { clearTimeout(timer); cleanup(); cb(null); };
+  function cleanup() { delete window[name]; if(script.parentNode) script.parentNode.removeChild(script); }
+  // Append callback param only if not already present
+  if (!url.includes('callback=')) {
+    const sep = url.includes('?') ? '&' : '?';
+    script.src = url + sep + 'callback=' + name;
+  } else {
+    script.src = url + name; // URL already has callback= prefix, append the name
+  }
+  document.head.appendChild(script);
+}
+
+function sheetsGet(action, dataObj, cb) {
+  const dataStr = encodeURIComponent(JSON.stringify(dataObj));
+  const name = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  const script = document.createElement('script');
+  const timer = setTimeout(() => { cleanup(); if(cb) cb(false); }, 12000);
+  window[name] = (res) => { clearTimeout(timer); cleanup(); if(cb) cb(res && res.status === 'ok'); };
+  script.onerror = () => { clearTimeout(timer); cleanup(); if(cb) cb(false); };
+  function cleanup() { delete window[name]; if(script.parentNode) script.parentNode.removeChild(script); }
+  script.src = SHEETS_URL + '?action=' + action + '&data=' + dataStr + '&callback=' + name;
+  document.head.appendChild(script);
+}
+
+// --- SUPERVISORES ---
+function syncSupsFromSheets(onDone) {
+  jsonpGet(SHEETS_URL + '?action=getSups', (res) => {
+    if(res && res.status==='ok' && res.data && res.data.length) {
+      saveSups(res.data);
+      renderSupSelector();
+      initLogin();
+    }
+    if(onDone) onDone(res);
+  });
+}
+
+function syncSupsToSheets(onDone) {
+  const list = getSups();
+  sheetsGet('saveSups', list, onDone);
+}
+
+// --- VENDEDORES ---
+function syncVendFromSheets(onDone) {
+  jsonpGet(SHEETS_URL + '?action=getVends', (res) => {
+    if(res && res.status==='ok' && res.data) {
+      // Save each supervisor's list
+      Object.keys(res.data).forEach(sup => {
+        localStorage.setItem('vendors_' + sup, JSON.stringify(res.data[sup]));
+      });
+      renderVendedorSelect();
+    }
+    if(onDone) onDone(res);
+  });
+}
+
+function syncVendToSheets(sup, onDone) {
+  // Build full vendor map from all supervisors in localStorage
+  const sups = getSups();
+  const allVend = {};
+  sups.forEach(s => { allVend[s.name] = getVendors(s.name); });
+  // Save full map to cloud
+  sheetsGet('saveVends', allVend, (ok) => {
+    if(onDone) onDone(ok);
+  });
+}
+
+// --- RAMOS ---
+function syncRamosFromSheets(onDone) {
+  jsonpGet(SHEETS_URL + '?action=getRamos', (res) => {
+    if(res && res.status==='ok' && res.data && res.data.length) {
+      const mixObj = {};
+      res.data.forEach(r => { mixObj[r.key] = {label: r.label, items: r.items}; });
+      saveMIX(mixObj); MIX = mixObj;
+    }
+    if(onDone) onDone(res);
+  });
+}
+
+function syncRamosToSheets(onDone) {
+  const m = getMIX();
+  const list = Object.keys(m).map(k => ({key: k, label: m[k].label, items: m[k].items}));
+  sheetsGet('saveRamos', list, onDone);
+}
+
+// Load all config from Sheets on startup
+function syncAllFromSheets(onDone) {
+  syncSupsFromSheets(() => {
+    syncVendFromSheets(() => {
+      syncRamosFromSheets(() => {
+        if(onDone) onDone();
+      });
+    });
+  });
+}
+
+// ---- LOGIN ----
+let _loggedSupervisor = '';
+
+function initLogin() {
+  const sups = getSups();
+  const sel = document.getElementById('login-usuario');
+  sel.innerHTML = '<option value="">Selecione...</option>' + sups.map(s=>`<option value="${s.name}">${s.name}</option>`).join('');
+}
+
+function fazerLogin() {
+  const user = document.getElementById('login-usuario').value;
+  const senha = document.getElementById('login-senha').value;
+  const sups = getSups();
+  const sup = sups.find(s=>s.name===user);
+  if(!sup || sup.senha !== senha) {
+    document.getElementById('login-erro').style.display = 'block';
+    document.getElementById('login-senha').value = '';
+    setTimeout(()=>document.getElementById('login-erro').style.display='none', 3000);
+    return;
+  }
+  _loggedSupervisor = user;
+  document.getElementById('login-screen').style.display = 'none';
+  // Pré-seleciona o supervisor no formulário
+  const fSup = document.getElementById('f-supervisor');
+  if(fSup) { fSup.value = user; renderVendedorSelect(); }
+  showToast('✅ Bem-vindo, ' + user + '!');
+}
+
+init();
+</script>
+</body>
+</html>
